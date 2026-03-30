@@ -1,0 +1,41 @@
+import requests
+import webbrowser
+import os
+
+cep = input("digite o CEP: ").replace("-","").strip()
+
+url = f"http://viacep.com.br/ws/{cep}/json/"
+resposta = requests.get(url)
+
+if resposta.status_code == 200:
+    dados = resposta.json()
+
+    if "erro" not in dados:
+        html = f"""
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>consulta de cep</title>
+        </head>
+        <body>
+            <h1>Resultado do CEP</h1>
+            <p><b>CEP:</b> {dados['cep']}</p>
+            <p><b>Rua:</b> {dados['logradouro']}</p>
+            <p><b>Bairro:</b> {dados['bairro']}</p>
+            <p><b>Cidade:</b> {dados['localidade']}</p>
+            <p><b>Estado:</b> {dados['uf']}</p>
+        </body>
+        </html>
+        """
+        
+        # Salva o arquivo
+        with open("resultado.html", "w", encoding="utf-8") as arquivo:
+            arquivo.write(html)
+      
+        caminho = os.path.abspath("resultado.html")
+        webbrowser.open(f"file://{caminho}")
+
+    else:
+        print("cep nao encontrado!") 
+else:
+    print("erro na requisiçao", resposta.status_code)
